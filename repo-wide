@@ -1,0 +1,99 @@
+# CONTRIBUTING
+
+This document collects lightweight, repo-level guidance for code style, project structure, and reviewer checklist to keep contributions consistent, readable, and maintainable.
+
+## 1. Java Code Style (lightweight)
+
+Purpose: Provide a minimal, consistent set of Java conventions used across the repository. These are intended to guide contributors and reviewers. They are intentionally small and focused — do not attempt to mirror every rule of a linter.
+
+Naming
+- Classes and interfaces: UpperCamelCase (e.g., CalculatorEngine, UserRepository).
+- Methods and fields: lowerCamelCase (e.g., calculateTotal, accountBalance).
+- Constants: UPPER_SNAKE_CASE (static final).
+- Packages: all lower-case, grouped by feature (com.example.billing).
+- Avoid abbreviations; prefer descriptive, searchable names.
+
+Formatting
+- Use 4-space indentation.
+- Max line length: 120 characters (prefer breaking long expressions into multiple lines).
+- Brace style: K&R-style (opening brace on the same line).
+- One statement per line.
+- Keep imports explicit and organized (java.*, javax.*, third-party, project).
+
+JavaDoc and Comments
+- Public classes, interfaces, and public/protected methods MUST have JavaDoc describing responsibility, important parameters, return value, and exceptions thrown.
+- JavaDoc should explain "why" and any non-obvious behavior; inline comments should explain rationale (not restate what code does).
+- Keep method-level comments concise—document intent, contracts, and side-effects.
+- Private helper methods may have short comments where clarity is needed.
+
+API & Visibility
+- Minimize public surface area. Prefer package-private or private unless an API is intended for external consumers.
+- Use interfaces for major abstractions and depend on interfaces rather than implementations.
+
+Error Handling & Validation
+- Validate public method inputs and throw IllegalArgumentException or specific checked exceptions with informative messages.
+- Avoid swallowing exceptions silently; log sufficiently and propagate when appropriate.
+
+Tests
+- Include unit tests for new/changed behavior.
+- Tests should be descriptive and assert a single behavior.
+
+Documentation
+- Update README and high-level docs when component responsibilities change.
+
+## 2. Top-level README section (Project structure & responsibilities)
+
+Add the following short section near the top of the repository README.md (or include a short summary here for maintainers to copy):
+
+Project layout (high-level)
+- /src/main/java/... — Production Java code, organized by feature packages.
+- /src/test/java/... — Unit and integration tests.
+- /docs — Project-level docs, ADRs, and design notes.
+- /tools, /scripts — Helper scripts (non-production).
+
+Key large files/components and responsibilities
+- CalculatorUI
+  - Responsibility: Presentation layer for calculator interactions and wiring UI events to the CalculatorEngine.
+  - Responsibilities include creating views, handling user input, validating UI-level input, and delegating calculations to the engine/service layer.
+  - Should not contain core calculation algorithms or business rules — those belong in CalculatorEngine or service classes.
+- CalculatorEngine (or equivalent core classes)
+  - Responsibility: Pure business logic for arithmetic and domain rules. Should be well-tested, stateless where possible, and easily reusable.
+- Persistence / Repository classes
+  - Responsibility: Data access and mapping. Keep transactional and persistence logic isolated from business logic.
+- Controller/Service classes
+  - Responsibility: Coordinate between UI/transport and business logic, apply orchestration and high-level validation.
+  
+Guiding principle: Follow separation of concerns—UI/view, business logic, and persistence code should be clearly separated.
+
+## 3. Reviewer checklist (short, actionable)
+
+Use this checklist during PR review to ensure maintainability and consistency. When a rule is flagged, request changes or suggest extraction/refactor.
+
+- JavaDoc coverage
+  - Ensure every public class and every public/protected method has appropriate JavaDoc (describe purpose, params, returns, exceptions).
+- Method complexity limit
+  - Flag methods with cyclomatic complexity > 15 for refactoring. Prefer extraction of private helpers, clearer naming, or splitting responsibilities.
+- Method length & focus
+  - Prefer small, single-purpose methods. If a method exceeds ~200 lines or does multiple things, request extraction into private helpers or new classes.
+- Prefer private helper extraction
+  - For long methods with distinct logical steps, prefer moving steps into well-named private methods to improve readability and testability.
+- Visibility hygiene
+  - Ensure types and members are as restrictive as possible (private > package-private > protected > public). Public APIs must be intentional and documented.
+- Tests
+  - Verify tests accompany behavior changes and edge cases are covered. New complex logic should include unit tests.
+- Naming & readability
+  - Names must be descriptive and consistent. Avoid abbreviations and ambiguous names.
+- Error handling
+  - Ensure exceptions are informative and that errors are not silently swallowed. Validate inputs at API boundaries.
+- Formatting
+  - Adhere to repo formatting: 4-space indentation, max line length ~120, and consistent brace placement.
+- Documentation updates
+  - If a public API or major file responsibility changes, update README/docs accordingly.
+
+How to act when checklist items fail
+- Suggest concrete changes (e.g., "Extract calculation step into private method computeTaxes() and add unit tests").
+- For complexity issues, prefer iterative, behavior-preserving refactors in follow-up PRs if immediate large refactors are risky — but file an issue/ADR tracking the technical debt.
+
+---
+
+This CONTRIBUTING file is intentionally concise and pragmatic. It aims to make reviews faster and ensure contributors and maintainers have a shared, lightweight baseline for Java code style, component responsibilities, and review expectations.
