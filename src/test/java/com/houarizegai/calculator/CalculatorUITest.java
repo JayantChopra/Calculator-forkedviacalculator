@@ -22,3 +22,4 @@ class CalculatorUITest {
         assertEquals(expectedResult, calculatorUI.calculate(firstNumber, secondNumber, operator));
     }
 }
+
